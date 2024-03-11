@@ -44,17 +44,19 @@ class _RankPageState extends State<RankPage>
   late RankStore rankStore;
   final modeList = [
     "day",
-    "day_male",
-    "day_female",
-    "week_original",
-    "week_rookie",
     "week",
     "month",
-    "day_ai",
-    "day_r18_ai",
     "day_r18",
     "week_r18",
-    "week_r18g"
+    "week_r18g",
+    "week_rookie",
+    "day_male",
+    "day_female",
+    "day_male_r18",
+    "day_female_r18",
+    "week_original",
+    "day_ai",
+    "day_r18_ai"
   ];
   var boolList = Map<int, bool>();
   late DateTime nowDate;
@@ -99,13 +101,13 @@ class _RankPageState extends State<RankPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final rankListMean = I18n.of(context).mode_list.split(' ');
+    final rankListMean = I18n.of(context).mode_list.split(';');
     return Observer(builder: (_) {
       if (rankStore.inChoice) {
         return _buildChoicePage(context, rankListMean);
       }
       if (rankStore.modeList.isNotEmpty) {
-        var list = I18n.of(context).mode_list.split(' ');
+        var list = I18n.of(context).mode_list.split(';');
         List<String> titles = [];
         for (var i = 0; i < rankStore.modeList.length; i++) {
           int index = modeList.indexOf(rankStore.modeList[i]);

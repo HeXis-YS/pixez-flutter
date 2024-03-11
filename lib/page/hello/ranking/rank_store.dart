@@ -25,17 +25,19 @@ abstract class _RankStoreBase with Store {
   static const MODE_LIST = 'mode_list';
   List<String> intialModeList = [
     "day",
-    "day_male",
-    "day_female",
-    "week_original",
-    "week_rookie",
     "week",
     "month",
-    "day_ai",
-    "day_r18_ai",
     "day_r18",
     "week_r18",
-    "week_r18g"
+    "week_r18g",
+    "week_rookie",
+    "day_male",
+    "day_female",
+    "day_male_r18",
+    "day_female_r18",
+    "week_original",
+    "day_ai",
+    "day_r18_ai"
   ];
   @observable
   ObservableList<String> modeList = ObservableList();
