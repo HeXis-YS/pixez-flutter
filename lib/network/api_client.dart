@@ -31,6 +31,7 @@ import 'package:pixez/models/illust_bookmark_tags_response.dart';
 import 'package:pixez/models/tags.dart';
 import 'package:pixez/models/ugoira_metadata_response.dart';
 import 'package:pixez/network/refresh_token_interceptor.dart';
+import 'package:pixez/network/web_client.dart';
 
 final ApiClient apiClient = ApiClient();
 
@@ -307,9 +308,31 @@ class ApiClient {
 
   Future<Response> getBookmarksIllust(
       int user_id, String restrict, String? tag) async {
-    return httpClient.get("/v1/user/bookmarks/illust",
+    Response response = await httpClient.get("/v1/user/bookmarks/illust",
         queryParameters:
             notNullMap({"user_id": user_id, "restrict": restrict, "tag": tag}));
+    var data = response.data;
+    // final WebClient webClient = WebClient();
+    // Dio webHttpClient = Dio(webClient.httpClient.options);
+    // for (var illust in illustList) {
+    for (var i = 0; i < data['illusts'].length; i++) {
+      if (data['illusts'][i]['image_urls']['large'] == "https://s.pximg.net/common/images/limit_sanity_level_360.png") {
+        // httpClient.options.baseUrl = "https://www.pixiv.net";
+        // httpClient.options.headers = {"Host": "https://www.pixiv.net"};
+        // String illust_id = data['illusts'][i]['id'].toString();
+        // Response webResponse = await httpClient.get("/ajax/illust/${illust_id}");
+        Response webResponse = await WebClient().getIllustDetail(data['illusts'][i]['id']);
+        data['illusts'][i]['image_urls']['large'] = webResponse.data['body']['urls']['regular'];
+        data['illusts'][i]['image_urls']['medium'] = webResponse.data['body']['urls']['regular'];
+        data['illusts'][i]['meta_single_page']['original_image_url'] = webResponse.data['body']['urls']['original'];
+      }
+    }
+
+    // String modifiedResponseBody = json.encode(decodedResponse);
+
+    // return Response(modifiedResponseBody, response.statusCode, {headers: response.headers});  
+    response.data = data;
+    return response;
   }
 
 /*  @FormUrlEncoded
