@@ -311,7 +311,6 @@ class ApiClient {
     Response response = await httpClient.get("/v1/user/bookmarks/illust",
         queryParameters:
             notNullMap({"user_id": user_id, "restrict": restrict, "tag": tag}));
-
     var illusts = response.data['illusts'];
     for (var illust in illusts) {
       if (illust['type'] == "illust" && illust['image_urls']['large'] == "https://s.pximg.net/common/images/limit_sanity_level_360.png") {
@@ -327,12 +326,13 @@ class ApiClient {
         illust['restrict'] = webIllust['restrict'];
         illust['user']['name'] = webIllust['userName'];
         illust['user']['account'] = webIllust['userAccount'];
-        // illust['user']['profile_image_urls']['medium'] = ADD APP_API
-        // illust['user']['is_followed'] = ADD APP_API
+        final Response user = await apiClient.getUser(illust['user']['id']);
+        illust['user']['profile_image_urls']['medium'] = user.data['user']['profile_image_urls']['medium'];
+        illust['user']['is_followed'] = user.data['user']['is_followed'];
         for (var tag in webIllust['tags']['tags']) {
           illust['tags'].add({"name": tag['tag'], "translated_name": tag['translation']['en']});
         }
-        // illust['tools']
+        // illust['tools'] = ?
         illust['create_date'] = webIllust['createDate'];
         illust['page_count'] = webIllust['pageCount'];
         illust['width'] = webIllust['width'];
@@ -357,7 +357,6 @@ class ApiClient {
         illust['illust_book_style'] = webIllust['bookStyle'];
       }
     }
-    // response.data['illusts'] = data;
     return response;
   }
 
