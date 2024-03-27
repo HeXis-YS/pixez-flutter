@@ -35,6 +35,10 @@ class WebClient {
     return httpClient.get("/ajax/illust/${illust_id}");
   }
 
+  Future<Response> getIllustPages(int illust_id) async {
+    return httpClient.get("/ajax/illust/${illust_id}/pages");
+  }
+
   WebClient() {
     // String time = getIsoDate();
     this.httpClient = Dio()

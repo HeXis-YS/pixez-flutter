@@ -339,15 +339,18 @@ class ApiClient {
         illust['height'] = webIllust['height'];
         illust['sanity_level'] = webIllust['sl'];
         illust['x_restrict'] = webIllust['xRestrict'];
-        // if (illust['page_count'] > 1) {
-        //   // /ajax/illust/106996086/pages
-        //   illust['meta_pages'][i]['image_urls']['square_medium'] =
-        //   illust['meta_pages'][i]['image_urls']['medium'] =
-        //   illust['meta_pages'][i]['image_urls']['large'] =
-        //   illust['meta_pages'][i]['image_urls']['original'] =
-        // } else {
+        if (illust['page_count'] > 1) {
+          final Response pages = await WebClient().getIllustPages(illust['id']);
+          for (var page in pages.data['body']) {
+            illust['meta_pages'].add({"image_urls": {
+                "square_medium": page['urls']['thumb_mini'],
+                "medium": page['urls']['small'],
+                "large": page['urls']['regular'],
+                "original": page['urls']['original']}});
+          }
+        } else {
           illust['meta_single_page']['original_image_url'] = webIllust['urls']['original'];
-        // }
+        }
         illust['total_view'] = webIllust['bookmarkCount'];
         illust['total_bookmarks'] = webIllust['viewCount'];
         // illust['is_bookmarked'] = No need?
