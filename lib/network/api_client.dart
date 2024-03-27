@@ -311,16 +311,6 @@ class ApiClient {
     Response response = await httpClient.get("/v1/user/bookmarks/illust",
         queryParameters:
             notNullMap({"user_id": user_id, "restrict": restrict, "tag": tag}));
-    // var data = response.data;
-    // for (var i = 0; i < data['illusts'].length; i++) {
-    //   if (data['illusts'][i]['image_urls']['large'] == "https://s.pximg.net/common/images/limit_sanity_level_360.png") {
-    //     Response webResponse = await WebClient().getIllustDetail(data['illusts'][i]['id']);
-    //     data['illusts'][i]['image_urls']['large'] = webResponse.data['body']['urls']['regular'];
-    //     data['illusts'][i]['image_urls']['medium'] = webResponse.data['body']['urls']['regular'];
-    //     data['illusts'][i]['meta_single_page']['original_image_url'] = webResponse.data['body']['urls']['original'];
-    //   }
-    // }
-    // response.data = data;
 
     var illusts = response.data['illusts'];
     for (var illust in illusts) {
@@ -339,11 +329,9 @@ class ApiClient {
         illust['user']['account'] = webIllust['userAccount'];
         // illust['user']['profile_image_urls']['medium'] = ADD APP_API
         // illust['user']['is_followed'] = ADD APP_API
-        // for (var tag in webIllust['tags']) {
-        //   // illust['tags'][i]['name'] = webIllust['tags'][i]['tag'];
-        //   // illust['tags'][i]['translated_name'] = webIllust['tags'][i]['translation']['en'];
-        //   illust['tags'].add({"name": tag['tag'], "translated_name": tag['translation']['en']});
-        // }
+        for (var tag in webIllust['tags']['tags']) {
+          illust['tags'].add({"name": tag['tag'], "translated_name": tag['translation']['en']});
+        }
         // illust['tools']
         illust['create_date'] = webIllust['createDate'];
         illust['page_count'] = webIllust['pageCount'];
@@ -353,10 +341,10 @@ class ApiClient {
         illust['x_restrict'] = webIllust['xRestrict'];
         // if (illust['page_count'] > 1) {
         //   // /ajax/illust/106996086/pages
-        //   // illust['meta_pages'][i]['image_urls']['square_medium'] =
-        //   // illust['meta_pages'][i]['image_urls']['medium'] =
-        //   // illust['meta_pages'][i]['image_urls']['large'] =
-        //   // illust['meta_pages'][i]['image_urls']['original'] =
+        //   illust['meta_pages'][i]['image_urls']['square_medium'] =
+        //   illust['meta_pages'][i]['image_urls']['medium'] =
+        //   illust['meta_pages'][i]['image_urls']['large'] =
+        //   illust['meta_pages'][i]['image_urls']['original'] =
         // } else {
           illust['meta_single_page']['original_image_url'] = webIllust['urls']['original'];
         // }
@@ -366,7 +354,7 @@ class ApiClient {
         illust['visible'] = true;
         // illust['is_muted'] = ?
         illust['illust_ai_type'] = webIllust['aiType'];
-        // illust['illust_book_style'] = illust['BookStyle'].toInt();
+        illust['illust_book_style'] = webIllust['bookStyle'];
       }
     }
     // response.data['illusts'] = data;
