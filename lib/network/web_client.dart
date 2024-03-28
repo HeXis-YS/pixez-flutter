@@ -51,8 +51,7 @@ class WebClient {
         'x_restrict',
         'total_view',
         'total_bookmarks',
-        'illust_ai_type',
-        'illust_book_style'
+        'illust_ai_type'
       ], webIllust, [
         'title', 
         'description', 
@@ -65,8 +64,7 @@ class WebClient {
         'xRestrict',
         'bookmarkCount',
         'viewCount',
-        'aiType',
-        'bookStyle']);
+        'aiType']);
     safeUpdateMultiple(illust['image_urls'], ['square_medium', 'medium', 'large'], webIllust['urls'], ['thumb', 'small', 'regular']);    
     safeUpdateMultiple(illust['user'], ['name', 'account'], webIllust, ['userName', 'userAccount']);
     final Response user = await apiClient.getUser(illust['user']['id']);
