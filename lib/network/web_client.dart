@@ -35,11 +35,11 @@ class WebClient {
     return httpClient.get('/ajax/illust/${illust_id}/pages');
   }
 
-  Future<void> updateWebIllust(Map illust) async {
+  Future<void> updateWebIllust(Map<String, dynamic> illust) async {
     final int illustId = illust['id'];
     final Response webResponse = await getIllustDetail(illustId);
-    final webIllust = webResponse.data['body'];
-    safeUpdateArray(illust, [
+    final Map<String, dynamic> webIllust = webResponse.data['body'];
+    safeUpdateMultiple(illust, [
         'title',
         'caption',
         'restrict',
@@ -67,29 +67,26 @@ class WebClient {
         'viewCount',
         'aiType',
         'bookStyle']);
-    safeUpdateArray(illust['image_urls'], ['square_medium', 'medium', 'large'], webIllust['urls'], ['thumb', 'small', 'regular']);    
-    safeUpdateArray(illust['user'], ['name', 'account'], webIllust, ['userName', 'userAccount']);
+    safeUpdateMultiple(illust['image_urls'], ['square_medium', 'medium', 'large'], webIllust['urls'], ['thumb', 'small', 'regular']);    
+    safeUpdateMultiple(illust['user'], ['name', 'account'], webIllust, ['userName', 'userAccount']);
     final Response user = await apiClient.getUser(illust['user']['id']);
     safeUpdate(illust['user']['profile_image_urls'], 'medium', user.data['user']['profile_image_urls']['medium']);
     safeUpdate(illust['user'], 'is_followed', user.data['user']['is_followed']);
-    for (var tag in webIllust['tags']['tags']) {
-      if (tag['translation']['en'] != null) {
-        illust['tags'].add({'name': tag['tag'], 'translated_name': tag['translation']['en']});
-      } else {
-        illust['tags'].add({'name': tag['tag']});
-      }
-    }
+    illust['tags'] = webIllust['tags']['tags'].map((tag) {
+      Map<String, dynamic> tagObject = {};
+      safeUpdate(tagObject, 'name', tag['tag']);
+      safeUpdate(tagObject, 'translated_name', tag['translation']['en']);
+      return tagObject.isNotEmpty ? tagObject : null;
+    }).toList();
     if (illust['page_count'] > 1) {
       final Response pages = await WebClient().getIllustPages(illustId);
-      for (var page in pages.data['body']) {
-        illust['meta_pages'].add({'image_urls': {
-            'square_medium': page['urls']['thumb_mini'],
-            'medium': page['urls']['small'],
-            'large': page['urls']['regular'],
-            'original': page['urls']['original']}});
-      }
+      illust['meta_pages'] = pages.data['body'].map((page) {
+        Map<String, dynamic> imageUrls = {};
+        safeUpdateMultiple(imageUrls, ['square_medium', 'medium', 'large', 'original'], page['urls'], ['thumb_mini', 'small', 'regular', 'original']);
+        return imageUrls.isNotEmpty ? {"image_urls": imageUrls} : null;
+      }).where((page) => page != null).toList();
     } else {
-      illust['meta_single_page']['original_image_url'] = webIllust['urls']['original'];
+      safeUpdate(illust['meta_single_page'], 'original_image_url', webIllust['urls']['original']);
     }
     illust['visible'] = true;
     // illust['type'] = Indirect
@@ -98,13 +95,13 @@ class WebClient {
     // illust['is_muted'] = ?
   }
 
-  void safeUpdate(Map dst, String key, dynamic newValue) {
-    if (dst != null && newValue != null) {
-      dst[key] = newValue;
+  void safeUpdate(Map<String, dynamic> dst, String dstKey, dynamic srcValue) {
+    if (dst != null && srcValue != null) {
+      dst[dstKey] = srcValue;
     }
   }
 
-  void safeUpdateArray(Map dst, var dstKeys, Map src, var srcKeys) {
+  void safeUpdateMultiple(Map<String, dynamic> dst, List<String> dstKeys, Map<String, dynamic> src, List<String> srcKeys) {
     if (dst == null || src == null) {
       return;
     }
