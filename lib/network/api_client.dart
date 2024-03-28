@@ -289,13 +289,19 @@ class ApiClient {
 
   Future<Response> getBookmarksIllustsOffset(
       int user_id, String restrict, String? tag, int? offset) async {
-    return httpClient.get("/v1/user/bookmarks/illust",
+    Response response = await httpClient.get("/v1/user/bookmarks/illust",
         queryParameters: notNullMap({
           "user_id": user_id,
           "restrict": restrict,
           "tag": tag,
           "offset": offset
         }));
+    for (var illust in response.data['illusts']) {
+      if (illust['type'] == "illust" && illust['image_urls']['large'] == "https://s.pximg.net/common/images/limit_sanity_level_360.png") {
+        await webClient.updateWebIllust(illust);
+      }
+    }
+    return response;
   }
 
   Future<Response> getUserNovels(int user_id) async {
