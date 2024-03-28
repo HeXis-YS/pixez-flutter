@@ -311,10 +311,9 @@ class ApiClient {
     Response response = await httpClient.get("/v1/user/bookmarks/illust",
         queryParameters:
             notNullMap({"user_id": user_id, "restrict": restrict, "tag": tag}));
-    var illusts = response.data['illusts'];
-    for (var illust in illusts) {
+    for (var illust in response.data['illusts']) {
       if (illust['type'] == "illust" && illust['image_urls']['large'] == "https://s.pximg.net/common/images/limit_sanity_level_360.png") {
-        await WebClient().updateWebIllust(illust);
+        await webClient.updateWebIllust(illust);
       }
     }
     return response;

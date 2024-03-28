@@ -23,6 +23,8 @@ import 'package:dio/io.dart';
 import 'package:intl/intl.dart';
 import 'package:pixez/network/api_client.dart';
 
+final WebClient webClient = WebClient();
+
 class WebClient {
   late Dio httpClient;
   static const BASE_API_URL_HOST = 'www.pixiv.net';
@@ -77,7 +79,7 @@ class WebClient {
       return tagObject.isNotEmpty ? tagObject : null;
     }).toList();
     if (illust['page_count'] > 1) {
-      final Response pages = await WebClient().getIllustPages(illustId);
+      final Response pages = await webClient.getIllustPages(illustId);
       illust['meta_pages'] = pages.data['body'].map((page) {
         Map<String, dynamic> imageUrls = {};
         safeUpdateMultiple(imageUrls, ['square_medium', 'medium', 'large', 'original'], page['urls'], ['thumb_mini', 'small', 'regular', 'original']);
