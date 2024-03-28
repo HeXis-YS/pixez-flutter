@@ -497,9 +497,14 @@ class ApiClient {
   @GET("/v1/illust/detail?filter=for_android")
   fun getIllust(@Header("Authorization") paramString: String, @Query("illust_id") paramLong: Long): Observable<IllustDetailResponse>
 */
-  Future<Response> getIllustDetail(int illust_id) {
-    return httpClient.get("/v1/illust/detail?filter=for_android",
+  Future<Response> getIllustDetail(int illust_id) async {
+    Response response = await httpClient.get("/v1/illust/detail?filter=for_android",
         queryParameters: {"illust_id": illust_id});
+    Map<String, dynamic> illust = response.data['illust'];
+    if (illust['type'] == "illust" && illust['image_urls']['large'] == "https://s.pximg.net/common/images/limit_sanity_level_360.png") {
+      await webClient.updateWebIllust(illust);
+    }
+    return response;
   }
 
   //   @GET("/v1/spotlight/articles?filter=for_android")
