@@ -314,50 +314,7 @@ class ApiClient {
     var illusts = response.data['illusts'];
     for (var illust in illusts) {
       if (illust['type'] == "illust" && illust['image_urls']['large'] == "https://s.pximg.net/common/images/limit_sanity_level_360.png") {
-        final Response webResponse = await WebClient().getIllustDetail(illust['id']);
-        final webIllust = webResponse.data['body'];
-        illust['title'] = webIllust['title'];
-        // illust['type'] = Indirect
-        illust['image_urls']['square_medium'] = webIllust['urls']['thumb']; // 360 - 250
-        illust['image_urls']['medium'] = webIllust['urls']['small'];
-        illust['image_urls']['large'] = webIllust['urls']['regular'];
-        
-        illust['caption'] = webIllust['description'];
-        illust['restrict'] = webIllust['restrict'];
-        illust['user']['name'] = webIllust['userName'];
-        illust['user']['account'] = webIllust['userAccount'];
-        final Response user = await apiClient.getUser(illust['user']['id']);
-        illust['user']['profile_image_urls']['medium'] = user.data['user']['profile_image_urls']['medium'];
-        illust['user']['is_followed'] = user.data['user']['is_followed'];
-        for (var tag in webIllust['tags']['tags']) {
-          illust['tags'].add({"name": tag['tag'], "translated_name": tag['translation']['en']});
-        }
-        // illust['tools'] = ?
-        illust['create_date'] = webIllust['createDate'];
-        illust['page_count'] = webIllust['pageCount'];
-        illust['width'] = webIllust['width'];
-        illust['height'] = webIllust['height'];
-        illust['sanity_level'] = webIllust['sl'];
-        illust['x_restrict'] = webIllust['xRestrict'];
-        if (illust['page_count'] > 1) {
-          final Response pages = await WebClient().getIllustPages(illust['id']);
-          for (var page in pages.data['body']) {
-            illust['meta_pages'].add({"image_urls": {
-                "square_medium": page['urls']['thumb_mini'],
-                "medium": page['urls']['small'],
-                "large": page['urls']['regular'],
-                "original": page['urls']['original']}});
-          }
-        } else {
-          illust['meta_single_page']['original_image_url'] = webIllust['urls']['original'];
-        }
-        illust['total_view'] = webIllust['bookmarkCount'];
-        illust['total_bookmarks'] = webIllust['viewCount'];
-        // illust['is_bookmarked'] = No need?
-        illust['visible'] = true;
-        // illust['is_muted'] = ?
-        illust['illust_ai_type'] = webIllust['aiType'];
-        illust['illust_book_style'] = webIllust['bookStyle'];
+        await WebClient().updateWebIllust(illust);
       }
     }
     return response;
