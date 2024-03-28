@@ -40,6 +40,9 @@ class WebClient {
   Future<void> updateWebIllust(Map<String, dynamic> illust) async {
     final int illustId = illust['id'];
     final Response webResponse = await getIllustDetail(illustId);
+    if (webResponse.data['error'] != false) {
+      return;
+    }
     final Map<String, dynamic> webIllust = webResponse.data['body'];
     safeUpdateMultiple(illust, [
         'title',
